@@ -58,3 +58,24 @@ par.norm_cams = 'sd_pc1'; % 'sd_pc1'; '95th_minus_5th'
 
 % repetitions to estimate "reliable variance"
 par.n_reps_reliable_var = 10;
+
+
+% Movie PCs used to predict neural activity
+par.n_behavPC = 2.^[0:7];
+
+% Number of neural PCs for the RRR-like analysis (CanonCor2) where we
+% predict neural activity from an increasing number of behavior PCs
+par.n_neuralPCs_from_behav = 1024;
+
+
+% delay between movie data and neural data (Applied on the neural data).
+% Can be a scalar or a vector to loop through. In number of bins
+par.delay_behav_neural = [0 1];
+
+% Percentage of blocks using for training SVCA models, and models that
+% predict neural activity from behavior
+par.fractrain_behav_neural = 0.5;
+
+% Lambda to regularize the models that predict neural activity from
+% behavior
+par.lambda_neural_behav = .15; 

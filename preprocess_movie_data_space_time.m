@@ -2,6 +2,7 @@
 % Preprocess movie data for space time study
 %
 
+function M = preprocess_movie_data_space_time( data, par )
 
 
 % Pick the appropriate data and downsample it
@@ -27,4 +28,6 @@ switch par.norm_cams
     case '95th_minus_5th'
         % divide by the difference between the 95th and 5th percentile
         error('not implemented yet');
+end
+
 end

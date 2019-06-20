@@ -32,11 +32,11 @@ for d = db_use
 
     % ---------------------------------------------------------------------
     % Preprocess the data: compute distances, subsample and de-mean -> X
-    preprocess_neural_data_space_time;
+    [X, xc, yc, nc, nt] = preprocess_neural_data_space_time( data, par );
     
     
     % Preprocess movie data: de-mean and normalize magnitude of PCs -> M
-    preprocess_movie_data_space_time;
+    M = preprocess_movie_data_space_time( data, par );
     
 
     % ---------------------------------------------------------------------

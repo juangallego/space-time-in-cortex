@@ -2,6 +2,7 @@
 % Preprocess data (downsamples and de-means) and computes distances
 %
 
+function [X, xc, yc, nc, nt] = preprocess_neural_data_space_time( data, par )
 
 
 % ---------------------------------------------------------------------

@@ -35,6 +35,8 @@ end
 
 
 
+% -------------------------------------------------------------------------
+%% PLOTS 
 
 % mice-specific colors
 cols_mouse = parula(length(db_use)+2);
@@ -67,3 +69,11 @@ xlabel('Movie dimension'),ylabel('Behavioral variance explained')
 title('All mice -- raw movie PCs')
 xlim([0 size(beh_var_expl,2)/2])
 legend(lgnd,'Location','NorthEast','Interpreter','none'), legend boxoff
+
+
+
+
+
+% -------------------------------------------------------------------------
+%%
+clearvars -except par res* db* dataroot matfig*

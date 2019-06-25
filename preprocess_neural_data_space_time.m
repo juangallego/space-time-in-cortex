@@ -10,7 +10,7 @@ function [X, xc, yc, nc, nt] = preprocess_neural_data_space_time( data, par )
 
 % Cells' coordinates
 xc = [data.stat.xglobal];
-yc = [data.stat.xglobal];
+yc = [data.stat.yglobal];
 
 % get number of neurons
 nc = numel(xc);

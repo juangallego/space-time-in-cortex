@@ -28,6 +28,8 @@ switch par.norm_cams
     case '95th_minus_5th'
         % divide by the difference between the 95th and 5th percentile
         error('not implemented yet');
+    case 'none'
+        % well... do nothing
 end
 
 end

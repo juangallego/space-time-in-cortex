@@ -38,7 +38,7 @@ function res = pred_neural_from_behav( X, M, par )
         % Estimate the left and right eigenvectors of the cross-cov matrix
         % U and V defined the dominant components of the training and
         % testing neurons ----I think
-        [shared_var, tot_var, U, V] = SVCA(X, nPCs, cells_train, cells_test, ...
+        [~, ~, U, V] = SVCA(X, nPCs, cells_train, cells_test, ...
             idx_train, idx_test);
         
 

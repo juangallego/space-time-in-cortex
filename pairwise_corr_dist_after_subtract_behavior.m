@@ -32,7 +32,7 @@ for d = db_use
 
     % ---------------------------------------------------------------------
     % Preprocess the data: compute distances, subsample and de-mean -> X
-    [X, xc, yc, nc, nt] = preprocess_neural_data_space_time( data, par );
+    [X, xc, yc, nc, nt, dist] = preprocess_neural_data_space_time( data, par );
     
     
     % Preprocess movie data: de-mean and normalize magnitude of PCs -> M
@@ -189,13 +189,13 @@ for d = db_use
         
         
         if par.save_figs
-            saveas(fh,fullfile([matfigroot filesep ...
+            saveas(fh,fullfile([matfigroot filesep 'corr_raw_vs_corr_no_mov_' ...
                 db(d).mouse_name '_' db(d).mouse_type '_' db(d).date ...
-                '_corr_vs_corr_no_mov.png']));
+                '.png']));
         end
     end
     
 end
 
 
-% clearvars -except par res* db* data* matfig*
+clearvars -except par res* db* data* matfig*

@@ -1,5 +1,12 @@
 %
-% 
+% Computes the % neural variance that is reliably explained by 'n' latent
+% signals (PCs) and how much of that shared variance can be described by
+% the behavioral movies
+%
+% ToDos:
+%   - The code does multiple iterations when computing the reliable neural
+%   variance, but because of how the code is setup, it always chooses the
+%   same neurons, making them effectively the same. Fix?
 %
 
 
@@ -63,12 +70,14 @@ for d = db_use
             % save results
             resPCsBehav.cov_neur(ctr,dim,1:n_dims,rep) = cov_neur;
             resPCsBehav.var_neur(ctr,dim,1:n_dims,rep) = var_neur;
-            resPCsBehav.max_nPCs_reliable_var(ctr) = n_dims;
         end
     end
-         
+
+    % save results
+    resPCsBehav.max_nPCs_reliable_var(ctr) = n_dims;
   
 
+    
     % ---------------------------------------------------------------------
     % ---------------------------------------------------------------------
     % How much neural variance can be reliably explained by behavior?
@@ -81,7 +90,7 @@ for d = db_use
     if par.useGPU, M = gpuArray(M); end
 
     
-    % ----------------------
+    % ---------------------------------------------------------------------
     % Do
     res_pred_neural_beh = pred_neural_from_behav( X, M, par );
     
@@ -93,31 +102,30 @@ for d = db_use
 
 
 
-    % ---------------------------------------------------------------------
-    % Final calculations
-
     % max number of PCs shared across analyses
     nSharedPCs = min( max(nPCs( nPCs < (nc/2) )), ...
-                        size(resPCsBehav.cov_res_behav,3) );
+                        par.n_neuralPCs_from_behav );
+    resPCsBehav.nSharedPCs_neural_behav(ctr) = nSharedPCs;
 
+                    
     % Reliable variance estimated from neural activity
     rel_var_neur = zeros( par.n_reps_reliable_var, nSharedPCs );
-    idx_PCs = find( nPCs==nSharedPCs );
+    idx_PCs = find( nPCs==resPCsBehav.nSharedPCs_neural_behav );
     for rep = 1:par.n_reps_reliable_var
         rel_var_neur(rep,:) = squeeze( resPCsBehav.cov_neur( ctr, idx_PCs, 1:nSharedPCs, rep ) ./ ...
             resPCsBehav.var_neur( ctr, idx_PCs, 1:nSharedPCs, rep ) );
     end
 
+    
     % Variance *not* explained by the behavior
     [~, idx_max_nBehavPC] = max(par.n_behavPC);
+%     rel_var_unexpl_beh = squeeze( resPCsBehav.cov_res_behav( ctr, idx_max_nBehavPC, 1:nSharedPCs ) ./ ...
+%             resPCsBehav.var_neur( ctr, idx_PCs, 1:nSharedPCs, rep ) );
     rel_var_unexpl_beh = squeeze( resPCsBehav.cov_res_behav( ctr, idx_max_nBehavPC, 1:nSharedPCs ) ./ ...
-            resPCsBehav.var_neur( ctr, idx_PCs, 1:nSharedPCs, rep ) );
+            mean( resPCsBehav.var_neur( ctr, idx_PCs, 1:nSharedPCs, : ), 4) );
 
 
-
-    % ---------------------------------------------------------------------
-    % Save these results
-
+    % store these results
     resPCsBehav.reliable_neural_var(ctr,:,:) = rel_var_neur';
     resPCsBehav.reliable_unexpl_beh(ctr,:) = rel_var_unexpl_beh;
 
@@ -125,8 +133,8 @@ for d = db_use
     
     % ---------------------------------------------------------------------
     % Plot for this dataset?
+
     if par.plot_interm
-        
         
         fhi = figure; 
         hold on
@@ -139,7 +147,6 @@ for d = db_use
         title(['spont_' db(d).mouse_name '_' db(d).date],'Interpreter','none')
         set(gca,'TickDir','out')
         ylim([0 1])
-
 
         if par.save_figs
             saveas(fhi,fullfile([matfigroot filesep ...
@@ -212,10 +219,13 @@ sem_rel_var_expl_beh = std( mean( resPCsBehav.reliable_neural_var, 3 ) - resPCsB
     /sqrt(length(db_use)-1);
 
 
+min_nSharedPCs = min([resPCsBehav.nSharedPCs_neural_behav]);
+
+
 fpa = figure; hold on
-shadedErrorBar( 1:nSharedPCs, mn_rel_neural_var, sem_rel_neural_var, ...
+shadedErrorBar( 1:min_nSharedPCs, mn_rel_neural_var, sem_rel_neural_var, ...
  'lineprops',{'-k','markerfacecolor',[.5,.5,.5]})
-shadedErrorBar( 1:nSharedPCs, mn_rel_var_expl_beh, sem_rel_var_expl_beh, ...
+shadedErrorBar( 1:min_nSharedPCs, mn_rel_var_expl_beh, sem_rel_var_expl_beh, ...
  'lineprops',{'-b','markerfacecolor',[0,0,.5]})
 set(gca,'XScale','log','TickDir','out')
 xlabel('SVC Dimension'),ylabel('Neural variance explained (%)')
@@ -241,9 +251,9 @@ sem_rel_var_expl_beh_good = std( mean( resPCsBehav.reliable_neural_var(idx_good_
 
 
 fpag = figure; hold on
-shadedErrorBar( 1:nSharedPCs, mn_rel_neural_var_good, sem_rel_neural_var_good, ...
+shadedErrorBar( 1:min_nSharedPCs, mn_rel_neural_var_good, sem_rel_neural_var_good, ...
  'lineprops',{'-k','markerfacecolor',[.5,.5,.5]})
-shadedErrorBar( 1:nSharedPCs, mn_rel_var_expl_beh_good, sem_rel_var_expl_beh_good, ...
+shadedErrorBar( 1:min_nSharedPCs, mn_rel_var_expl_beh_good, sem_rel_var_expl_beh_good, ...
  'lineprops',{'-b','markerfacecolor',[0,0,.5]})
 set(gca,'XScale','log','TickDir','out')
 xlabel('SVC Dimension'),ylabel('Neural variance explained (%)')
@@ -251,12 +261,6 @@ title('All "good" mice')
 legend('Max. explainable','Behavior','Location','NorthEast','Interpreter','none'), legend boxoff
 xlim([0 max(par.n_behavPC)]); ylim([0 1])
 
-
-
-% -------------------------------------------------------------------------
-
-clearvars -except par res* db* dataroot matfig*
-clear res_pred_neural_beh
 
 
 % -------------------------------------------------------------------------
@@ -272,3 +276,8 @@ if par.save_figs
                 'reliable_neural_and_behav_variance_pooled_across_good_mice.png']));
 end
 
+
+% -------------------------------------------------------------------------
+
+clearvars -except par res* db* dataroot matfig*
+clear res_pred_neural_beh

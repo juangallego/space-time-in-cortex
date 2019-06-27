@@ -29,7 +29,7 @@ cells_test = nrand(ceil(nc/2)+1:end);
 
 % Split time bins into training and testing sets
 %    hardcoded to use 50 % of bins for training and 50 % for testing
-[idx_train, idx_test] = splitInterleaved( nt, par.Lblock, par.fractrain_behav_neural ,1);
+[idx_train, idx_test] = splitInterleaved( nt, par.Lblock_reliable_var, par.fractrain_reliable_var, 1);
 
 
 % Reliably estimate the shared variance

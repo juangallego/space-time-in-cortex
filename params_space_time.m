@@ -54,11 +54,21 @@ par.norm_cams = 'sd_pc1'; % 'sd_pc1'; '95th_minus_5th'
     
 
 % -------------------------------------------------------------------------
-% Relationship neural PCs and behavior
+% Reliably estimate percentage of neural variance explianed by X latent
+% signals
 
 % repetitions to estimate "reliable variance"
 par.n_reps_reliable_var = 10;
 
+% block size (for splitting into training and testin sets)
+par.Lblock_reliable_var = round(60/.8);
+
+% Percentage of blocks that will be used for model training (PCA)
+par.fractrain_reliable_var = 0.5;
+
+
+% -------------------------------------------------------------------------
+% Relationship neural PCs and behavior
 
 % Movie PCs used to predict neural activity
 par.n_behavPC = 2.^[0:7];

@@ -25,7 +25,7 @@ for d = db_use
    
     % ---------------------------------------------------------------------
     % Preprocess the data: compute distances, subsample and de-mean
-    preprocess_neural_data_space_time;
+    [X, xc, yc, nc, nt, dist] = preprocess_neural_data_space_time( data, par );
     
        
     

@@ -171,18 +171,16 @@ title(lgah,'# of cells')
 % -------------------------------------------------------------------------
 % GOOD MICE
 
-idx_good_mice = [1 2 4 6];
-
 
 % Grand mean, etc. Same as above
-idx_max_nCells_good = find( nCells == max(resVarvsCells.max_nCells(idx_good_mice)) );
+idx_max_nCells_good = find( nCells == max(resVarvsCells.max_nCells(par.idx_good_mice)) );
 mn_rel_var_vs_cells_good = zeros( nPCs_latent, idx_max_nCells_all );
 sem_rel_var_vs_cells_good = zeros( nPCs_latent, idx_max_nCells_all );
 
 for ic = 1:idx_max_nCells_all
-    mn_rel_var_vs_cells_good(:,ic) = nanmean( resVarvsCells.reliable_neural_var(idx_good_mice,ic,:),1 );
-    sem_rel_var_vs_cells_good(:,ic) = nanstd( resVarvsCells.reliable_neural_var(idx_good_mice,ic,:),1, 1 )...
-        /sqrt(length(db_use(idx_good_mice)));
+    mn_rel_var_vs_cells_good(:,ic) = nanmean( resVarvsCells.reliable_neural_var(par.idx_good_mice,ic,:),1 );
+    sem_rel_var_vs_cells_good(:,ic) = nanstd( resVarvsCells.reliable_neural_var(par.idx_good_mice,ic,:),1, 1 )...
+        /sqrt(length(db_use(par.idx_good_mice)));
 end
 
 
@@ -200,6 +198,21 @@ lgah = legend(lgda,'Location','NorthEast'); legend boxoff
 title(lgah,'# of cells')
 
 
+fhagl = figure; hold
+for ic = 1:idx_max_nCells_all
+    shadedErrorBar( 1:nPCs_latent, mn_rel_var_vs_cells_good(:,ic), ...
+        sem_rel_var_vs_cells_good(:,ic), 'lineprops', {'color',cols_all(ic,:),...
+        'markerfacecolor',cols_all(ic,:)})
+end
+set(gca,'XScale','log','YScale','log','TickDir','out')
+xlabel('SVC Dimension'),ylabel('Neural variance explained (%)')
+title('All "good" mice')
+xlim([0 256]),ylim([1E-1 1])
+lgahl = legend(lgda,'Location','NorthEast'); legend boxoff
+title(lgah,'# of cells')
+
+
+
 % -------------------------------------------------------------------------
 
 if par.save_figs
@@ -208,6 +221,9 @@ if par.save_figs
 
     saveas(fhag,fullfile([matfigroot filesep ...
                 'reliable_var_fcn_nbr_cells_pooled_across_good_mice.png']));
+            
+    saveas(fhagl,fullfile([matfigroot filesep ...
+                'reliable_var_fcn_nbr_cells_pooled_across_good_mice_log.png']));
 end
 
 
